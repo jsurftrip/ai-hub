@@ -1,0 +1,51 @@
+# ===== チャット生ログ（端末ローカル。フォルダだけ残す） =====
+projects/*/raw/*
+!projects/*/raw/.gitkeep
+
+# ===== 秘密情報 =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa*
+id_ed25519*
+*secret*
+*credential*
+*token*
+*apikey*
+*api_key*
+.netrc
+.npmrc
+.pypirc
+service-account*.json
+client_secret*.json
+
+# ===== 個人情報・顧客データになりやすいもの =====
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+*.dump
+*.vcf
+*.pdf
+private/
+personal/
+
+# ===== ローカル設定・生成物 =====
+.claude/settings.local.json
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+*.log
+*.swp
