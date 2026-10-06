@@ -1,0 +1,57 @@
+name: ingest-wrapup
+
+# 「作業終了の記録」Issue フォームの投稿を logs/・STATUS.md・INDEX.md に反映する。
+# リポジトリのオーナー本人が作った [wrapup] Issue だけを処理する。
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ingest-wrapup
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    if: startsWith(github.event.issue.title, '[wrapup]') && github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ingest
+        id: ingest
+        env:
+          # Issue 本文は環境変数経由でのみ渡す（シェルに直接埋め込まない）
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          set +e
+          python3 scripts/hub.py ingest --env ISSUE_BODY > "$RUNNER_TEMP/result.txt" 2>&1
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+          cat "$RUNNER_TEMP/result.txt"
+
+      - name: Commit and push
+        if: steps.ingest.outputs.rc == '0'
+        env:
+          NUM: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "wrapup: Issue #${NUM} から記録を反映"
+          git push
+
+      - name: Comment and close
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUM: ${{ github.event.issue.number }}
+          RC: ${{ steps.ingest.outputs.rc }}
+        run: |
+          gh issue comment "$NUM" --body-file "$RUNNER_TEMP/result.txt" || true
+          if [ "$RC" = "0" ]; then
+            gh issue close "$NUM" --reason completed
+          fi

@@ -51,3 +51,13 @@ scripts/hub.py           INDEX 更新・停滞検出・案件追加
 - `python3 scripts/hub.py sync [--days 7] [--json] [--fail-on-stale]` … INDEX更新 + 停滞案件の列挙
 - `python3 scripts/hub.py stale` … 停滞案件の列挙のみ
 - Claude Code 以外のAI向け: `AGENTS.md` と `prompts/`
+
+## 運用の使い分け
+- **Claude Code（メイン）**: 開始時は CLAUDE.md のルールで自動的に読む。終了時は `/wrapup`。
+- **ChatGPT（プロジェクト機能）**: 開始時は `projects/<案件>/CONTEXT.md`（自動生成）を貼る。
+  終了時は「終了」と言って出力させた要約を、GitHub の Issue フォーム「作業終了の記録」に貼る
+  → `.github/workflows/ingest-wrapup.yml` が logs/・STATUS.md・INDEX.md に反映する。
+  指示文は `prompts/chatgpt-project-instructions.md`。
+- ChatGPT 側の要約を Claude Code で記録したい場合は `/wrapup <案件> （要約を貼る）` でも可。
+- `CONTEXT.md` と `.github/ISSUE_TEMPLATE/wrapup.yml` は自動生成物。`hub.py sync` で更新される（手で編集しない）。
+- 案件を追加したら必ず `hub.py sync`（`/new-project` は自動で実行する）。Issue フォームの案件一覧が更新される。

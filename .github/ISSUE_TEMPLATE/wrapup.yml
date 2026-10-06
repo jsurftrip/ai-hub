@@ -1,0 +1,21 @@
+# 自動生成: `python3 scripts/hub.py sync` で更新。手で編集しない
+name: 作業終了の記録（wrapup）
+description: ChatGPT 等が出力した終了時の要約を貼ると、logs/・STATUS.md・INDEX.md に自動反映される
+title: "[wrapup] "
+body:
+  - type: dropdown
+    id: project
+    attributes:
+      label: 案件
+      options:
+        - pipes
+        - travelcare
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 要約
+      description: prompts/wrapup.md で出力させた内容をそのまま貼る（APIキー・個人情報は含めない）
+    validations:
+      required: true
